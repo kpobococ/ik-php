@@ -9,6 +9,8 @@ Basic usage
 First you have to include and initialize the library:
 
 ```php
+<?php
+
 include_once 'path/to/interkassa.php';
 Interkassa::register();
 ```
