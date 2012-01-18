@@ -105,8 +105,8 @@ try {
 $payment = $status->getPayment();
 ```
 
-The `$status` variable now contains an instance of Interkassa_Status class. The
-`$payment` variable holds an instance of Interkassa_Payment with all the initial
+The `$status` variable now contains an instance of `Interkassa_Status` class. The
+`$payment` variable holds an instance of `Interkassa_Payment` with all the initial
 data.
 
 Note, that success and fail status updates are also supported, but do not have
