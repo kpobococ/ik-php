@@ -19,6 +19,8 @@ classes without any further include statements.
 Next, let's create a simple payment:
 
 ```php
+<?php
+
 // The following parameters are provided by interkassa
 $shop_id = '...';
 $secret_key = '...';
@@ -44,6 +46,10 @@ $payment = $shop->createPayment(array(
 We now have everything we need to render the payment form:
 
 ```php
+<?php
+
+// ... create and configure the payment object
+
 ?>
 <form action="<?= $payment->getFormAction(); ?>" method="post">
     <?php foreach ($payment->getFormValues() as $field => $value): ?>
@@ -65,6 +71,8 @@ configure this URL via your account on interkassa or send the URL with other
 payment data:
 
 ```php
+<?php
+
 $payment = $shop->createPayment(array(
     // ... usual payment data
     'status_url' => 'http://example.com/ik-status.php'
@@ -74,6 +82,10 @@ $payment = $shop->createPayment(array(
 And inside the `ik-status.php`:
 
 ```php
+<?php
+
+// ... initialize library as usual
+
 $shop = Interkassa_Shop::factory(array(
     'id' => $shop_id,
     'secret_key' => $secret_key
