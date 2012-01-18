@@ -1,8 +1,10 @@
-= Interkassa API for PHP =
+Interkassa API for PHP
+======================
 
 This library simplifies working with [interkassa payment system](http://interkassa.com).
 
-= Basic usage =
+Basic usage
+-----------
 
 First you have to include and initialize the library:
 
@@ -55,7 +57,8 @@ Note that the above example does not escape any data. If you have double quotes
 or other entities in payment description, you have to escape the values manually,
 using `htmlentities()` php function, for example.
 
-= Processing payment status requests =
+Processing payment status requests
+----------------------------------
 
 Interkassa can send payment status updates to a URL of your choosing. You can
 configure this URL via your account on interkassa or send the URL with other
@@ -96,7 +99,17 @@ Note, that success and fail status updates are also supported, but do not have
 a signature, and are sent via the user's browser, so it is not recommended to
 rely on them.
 
-= Requirements =
+Requirements
+------------
 
 This library requires at least PHP 5.1.0 to work correctly. However, the most
 recent PHP version is always recommended.
+
+License
+-------
+
+This library is released under the Open Source MIT license, which gives you the
+possibility to use it and modify it in every circumstance.
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
