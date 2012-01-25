@@ -58,12 +58,32 @@ class Interkassa_Status
      * @param Interkassa_Shop $shop
      * @param array $source the data source to use, e.g. $_POST.
      *
-     * @throws Interkassa_Exception if received shop id does not match current
-     *                              shop id or received signature is invalid
+     * @throws Interkassa_Exception if some data not received, received shop id
+     *                              does not match current shop id or received
+     *                              signature is invalid
      */
     public function __construct(Interkassa_Shop $shop, array $source)
     {
         $this->_shop = $shop;
+
+        foreach (array(
+            'ik_shop_id'           => 'Shop id',
+            'ik_payment_id'        => 'Payment id',
+            'ik_payment_amount'    => 'Payment amount',
+            'ik_payment_desc'      => 'Payment description',
+            'ik_paysystem_alias'   => 'Payment system alias',
+            'ik_baggage_fields'    => 'Baggage field',
+            'ik_payment_timestamp' => 'Payment timestamp',
+            'ik_payment_state'     => 'Payment state',
+            'ik_trans_id'          => 'Transaction id',
+            'ik_currency_exch'     => 'Currency exchange rate',
+            'ik_fees_payer'        => 'Transaction fees payer'
+        ) as $field => $title)
+        {
+            if (!isset($source[$field])) {
+                throw new Interkassa_Exception($title . ' not received');
+            }
+        }
 
         $received_id = strtoupper($source['ik_shop_id']);
         $shop_id     = strtoupper($shop->getId());
@@ -87,16 +107,15 @@ class Interkassa_Status
             'description' => $source['ik_payment_desc']
         ));
 
-        if ($source['ik_paysystem_alias']) {
+        if (!empty($source['ik_paysystem_alias'])) {
             $payment->setPaysystemAlias($source['ik_paysystem_alias']);
         }
 
-        if ($source['ik_baggage_fields']) {
+        if (!empty($source['ik_baggage_fields'])) {
             $payment->setBaggage($source['ik_baggage_fields']);
         }
 
-        $this->_payment = $payment;
-
+        $this->_payment       = $payment;
         $this->_timestamp     = (int) $source['ik_payment_timestamp'];
         $this->_state         = (string) $source['ik_payment_state'];
         $this->_trans_id      = (string) $source['ik_trans_id'];
