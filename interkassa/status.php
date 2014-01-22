@@ -8,6 +8,7 @@
  * @license MIT-style license
  * @package Interkassa
  * @author Anton Suprun <kpobococ@gmail.com>
+ * @author Odarchenko N.D. <odarchenko.n.d@gmail.com>
  * @version 1.0.0
  */
 
@@ -31,7 +32,7 @@ class Interkassa_Status
     protected $_timestamp;
     protected $_state;
     protected $_trans_id;
-    protected $_currency_rate;
+    protected $_currency;
     protected $_fees_payer;
 
     protected $_shop;
@@ -67,60 +68,49 @@ class Interkassa_Status
         $this->_shop = $shop;
 
         foreach (array(
-            'ik_shop_id'           => 'Shop id',
-            'ik_payment_id'        => 'Payment id',
-            'ik_payment_amount'    => 'Payment amount',
-            'ik_payment_desc'      => 'Payment description',
-            'ik_paysystem_alias'   => 'Payment system alias',
-            'ik_baggage_fields'    => 'Baggage field',
-            'ik_payment_timestamp' => 'Payment timestamp',
-            'ik_payment_state'     => 'Payment state',
-            'ik_trans_id'          => 'Transaction id',
-            'ik_currency_exch'     => 'Currency exchange rate',
-            'ik_fees_payer'        => 'Transaction fees payer'
-        ) as $field => $title)
-        {
-            if (!isset($source[$field])) {
+                     'ik_co_id' => 'Shop id',
+                     'ik_pm_no' => 'Payment id',
+                     'ik_am' => 'Payment amount',
+                     'ik_desc' => 'Payment description',
+                     'ik_pw_via' => 'Payway Via',
+                     'ik_act' => 'Action',
+                     'ik_sign' => 'Payment Signature',
+                     'ik_cur' => 'Currency',
+                     'ik_inv_prc' => 'Payment Time',
+                     'ik_inv_st' => 'Payment State',
+                     'ik_trn_id' => 'Transaction',
+                     'ik_ps_price' => 'PaySystem Price',
+                     'ik_co_rfn' => 'Checkout Refund'
+                 ) as $field => $title)
+            if (!isset($source[$field]))
                 throw new Interkassa_Exception($title . ' not received');
-            }
-        }
 
-        $received_id = strtoupper($source['ik_shop_id']);
-        $shop_id     = strtoupper($shop->getId());
+        $received_id = strtoupper($source['ik_co_id']);
+        $shop_id = strtoupper($shop->getId());
 
-        if ($received_id !== $shop_id) {
+        if ($received_id !== $shop_id)
             throw new Interkassa_Exception('Received shop id does not match current shop id');
-        }
 
-        if (isset($source['ik_sign_hash']))
-        {
-            if (!$this->_checkSignature($source)) {
-                throw new Interkassa_Exception('Signature does not match the data');
-            }
-
+        if ($this->_checkSignature($source))
             $this->_verified = true;
-        }
+        else
+            throw new Interkassa_Exception('Signature does not match the data');
 
         $payment = $shop->createPayment(array(
-            'id'          => $source['ik_payment_id'],
-            'amount'      => $source['ik_payment_amount'],
-            'description' => $source['ik_payment_desc']
+            'id' => $source['ik_pm_no'],
+            'amount' => $source['ik_am'],
+            'description' => $source['ik_desc']
         ));
 
-        if (!empty($source['ik_paysystem_alias'])) {
-            $payment->setPaysystemAlias($source['ik_paysystem_alias']);
-        }
+        if (!empty($source['ik_x_baggage']))
+            $payment->setBaggage($source['ik_x_baggage']);
 
-        if (!empty($source['ik_baggage_fields'])) {
-            $payment->setBaggage($source['ik_baggage_fields']);
-        }
-
-        $this->_payment       = $payment;
-        $this->_timestamp     = (int) $source['ik_payment_timestamp'];
-        $this->_state         = (string) $source['ik_payment_state'];
-        $this->_trans_id      = (string) $source['ik_trans_id'];
-        $this->_currency_rate = (float) $source['ik_currency_exch'];
-        $this->_fees_payer    = (int) $source['ik_fees_payer'];
+        $this->_payment = $payment;
+        $this->_timestamp = $source['ik_inv_prc'];
+        $this->_state = (string)$source['ik_inv_st'];
+        $this->_trans_id = (string)$source['ik_trn_id'];
+        $this->_currency = $source['ik_cur'];
+        $this->_fees_payer = $source['ik_ps_price'] - $source['ik_co_rfn'];
     }
 
     /**
@@ -177,33 +167,15 @@ class Interkassa_Status
      *
      * @return float
      */
-    public function getCurrencyRate()
+    public function getCurrencyName()
     {
-        return $this->_currency_rate;
-    }
-
-    /**
-     * Get currency exchage rate as string
-     *
-     * Returns the currency exchange rate defined in shop preferences at the
-     * time of the transaction, formatted as a string
-     *
-     * @param int $decimals number of decimal points
-     *
-     * @return string
-     */
-    public function getCurrencyRateAsString($decimals = 2)
-    {
-        return number_format($this->_currency_rate, $decimals, '.', '');
+        return $this->_currency;
     }
 
     /**
      * Get transaction fees payer
      *
-     * Returns {@link Interkassa::FEES_PAYER_SHOP}, {@link Interkassa::FEES_PAYER_BUYER}
-     * or {@link Interkassa::FEES_PAYER_EQUAL}
-     *
-     * @return type
+     * @return float
      */
     public function getFeesPayer()
     {
@@ -255,19 +227,11 @@ class Interkassa_Status
      */
     final protected function _checkSignature($source)
     {
-        $signature = strtoupper(md5(implode(':', array(
-            $source['ik_shop_id'],
-            $source['ik_payment_amount'],
-            $source['ik_payment_id'],
-            $source['ik_paysystem_alias'],
-            $source['ik_baggage_fields'],
-            $source['ik_payment_state'],
-            $source['ik_trans_id'],
-            $source['ik_currency_exch'],
-            $source['ik_fees_payer'],
-            $this->getShop()->getSecretKey()
-        ))));
-
-        return $source['ik_sign_hash'] === $signature;
+        $post = $source;
+        unset($post['ik_sign']);
+        ksort($post, SORT_STRING);
+        array_push($post, $this->getShop()->getSecretKey());
+        $signature = base64_encode(md5(implode(':', $post), true));
+        return $source['ik_sign'] === $signature;
     }
 }

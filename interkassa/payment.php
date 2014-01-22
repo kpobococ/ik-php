@@ -8,6 +8,7 @@
  * @license MIT-style license
  * @package Interkassa
  * @author Anton Suprun <kpobococ@gmail.com>
+ * @author Odarchenko N.D. <odarchenko.n.d@gmail.com>
  * @version 1.0.0
  */
 
@@ -53,12 +54,6 @@ class Interkassa_Payment
      */
     protected $_description;
 
-    /**
-     * Paysystem alias
-     *
-     * @var string|bool
-     */
-    protected $_paysystem_alias = false;
 
     /**
      * Payment baggage field
@@ -114,12 +109,20 @@ class Interkassa_Payment
      *
      * @var string
      */
-    protected $_form_action = 'http://www.interkassa.com/lib/payment.php';
+    protected $_form_action = 'https://sci.interkassa.com/';
+
+    /**
+     * Users Locale
+     * @var string
+     */
+    protected $_locale = false;
 
     /**
      * Create payment instance
      *
-     * @param Interkassa_Shop $interkassa
+     * @param Interkassa_Shop $shop
+     * @param array $options
+     * @internal param \Interkassa_Shop $interkassa
      *
      * @see Interkassa_Payment::__construct()
      *
@@ -156,56 +159,69 @@ class Interkassa_Payment
     {
         $this->_shop = $shop;
 
-        if (!isset($options['id'])) {
+        if (!isset($options['id']))
+        {
             throw new Interkassa_Exception('Payment id is required');
         }
 
-        if (!isset($options['amount'])) {
+        if (!isset($options['amount']))
+        {
             throw new Interkassa_Exception('Payment amount is required');
         }
 
-        if (!isset($options['description'])) {
+        if (!isset($options['description']))
+        {
             throw new Interkassa_Exception('Payment description is required');
         }
 
-        $this->_id          = (string) $options['id'];
-        $this->_amount      = (float)  $options['amount'];
-        $this->_description = (string) $options['description'];
+        $this->_id = (string)$options['id'];
+        $this->_amount = (float)$options['amount'];
+        $this->_description = (string)$options['description'];
 
-        if (!empty($options['paysystem_alias'])) {
-            $this->setPaysystemAlias($options['paysystem_alias']);
-        }
 
-        if (!empty($options['baggage'])) {
+        if (!empty($options['baggage']))
+        {
             $this->setBaggage($options['baggage']);
         }
 
-        if (!empty($options['success_url'])) {
+        if (!empty($options['success_url']))
+        {
             $this->setSuccessUrl($options['success_url']);
         }
 
-        if (!empty($options['success_method'])) {
+        if (!empty($options['success_method']))
+        {
             $this->setSuccessMethod($options['success_method']);
         }
 
-        if (!empty($options['fail_url'])) {
+        if (!empty($options['fail_url']))
+        {
             $this->setFailUrl($options['fail_url']);
         }
 
-        if (!empty($options['fail_method'])) {
+        if (!empty($options['fail_method']))
+        {
             $this->setFailMethod($options['fail_method']);
         }
 
-        if (!empty($options['status_url'])) {
+        if (!empty($options['status_url']))
+        {
             $this->setStatusUrl($options['status_url']);
         }
 
-        if (!empty($options['status_method'])) {
+        if (!empty($options['status_method']))
+        {
             $this->setStatusMethod($options['status_method']);
         }
 
-        if (!empty($options['form_action'])) {
+        if (!empty($options['form_action']))
+        {
             $this->setFormAction($options['form_action']);
+        }
+
+        if (!empty($options['locale']))
+        {
+            $this->setLocale($options['locale']);
         }
     }
 
@@ -252,34 +268,6 @@ class Interkassa_Payment
     }
 
     /**
-     * Get payment system alias
-     *
-     * @return string
-     */
-    public function getPaysystemAlias()
-    {
-        return $this->_paysystem_alias;
-    }
-
-    /**
-     * Set payment system alias
-     *
-     * See interkassa tech doc for a list of accepted values
-     *
-     * @param string $paysystem_alias
-     *
-     * @return Interkassa_Payment self
-     */
-    public function setPaysystemAlias($paysystem_alias)
-    {
-        if (!empty($paysystem_alias)) {
-            $this->_paysystem_alias = (string) $paysystem_alias;
-        }
-
-        return $this;
-    }
-
-    /**
      * Get payment baggage field
      *
      * @return string
@@ -298,8 +286,9 @@ class Interkassa_Payment
      */
     public function setBaggage($baggage)
     {
-        if (!empty($baggage)) {
-            $this->_baggage = (string) $baggage;
+        if (!empty($baggage))
+        {
+            $this->_baggage = (string)$baggage;
         }
 
         return $this;
@@ -324,8 +313,9 @@ class Interkassa_Payment
      */
     public function setSuccessUrl($url)
     {
-        if (!empty($url)) {
-            $this->_success_url = (string) $url;
+        if (!empty($url))
+        {
+            $this->_success_url = (string)$url;
         }
 
         return $this;
@@ -357,7 +347,8 @@ class Interkassa_Payment
      */
     public function setSuccessMethod($method)
     {
-        if (empty($method)) {
+        if (empty($method))
+        {
             return $this;
         }
 
@@ -367,7 +358,8 @@ class Interkassa_Payment
             Interkassa::METHOD_LINK
         );
 
-        if (in_array($method, $methods)) {
+        if (in_array($method, $methods))
+        {
             $this->_success_method = $method;
         }
 
@@ -393,8 +385,9 @@ class Interkassa_Payment
      */
     public function setFailUrl($url)
     {
-        if (!empty($url)) {
-            $this->_fail_url = (string) $url;
+        if (!empty($url))
+        {
+            $this->_fail_url = (string)$url;
         }
 
         return $this;
@@ -426,7 +419,8 @@ class Interkassa_Payment
      */
     public function setFailMethod($method)
     {
-        if (empty($method)) {
+        if (empty($method))
+        {
             return $this;
         }
 
@@ -436,7 +430,8 @@ class Interkassa_Payment
             Interkassa::METHOD_LINK
         );
 
-        if (in_array($method, $methods)) {
+        if (in_array($method, $methods))
+        {
             $this->_fail_method = $method;
         }
 
@@ -462,8 +457,9 @@ class Interkassa_Payment
      */
     public function setStatusUrl($url)
     {
-        if (!empty($url)) {
-            $this->_status_url = (string) $url;
+        if (!empty($url))
+        {
+            $this->_status_url = (string)$url;
         }
 
         return $this;
@@ -495,9 +491,8 @@ class Interkassa_Payment
      */
     public function setStatusMethod($method)
     {
-        if (empty($method)) {
+        if (empty($method))
             return $this;
-        }
 
         $methods = array(
             Interkassa::METHOD_POST,
@@ -505,7 +500,8 @@ class Interkassa_Payment
             Interkassa::METHOD_OFF
         );
 
-        if (in_array($method, $methods)) {
+        if (in_array($method, $methods))
+        {
             $this->_status_method = $method;
         }
 
@@ -524,44 +520,41 @@ class Interkassa_Payment
      */
     public function getFormValues()
     {
-        $return = array(
-            'ik_shop_id'         => $this->getShop()->getId(),
-            'ik_payment_amount'  => $this->getAmountAsString(),
-            'ik_payment_id'      => $this->getId(),
-            'ik_payment_desc'    => $this->getDescription(),
-            'ik_paysystem_alias' => ''
+        $fields = array(
+            'ik_co_id' => $this->getShop()->getId(),
+            'ik_am' => $this->getAmountAsString(),
+            'ik_pm_no' => $this->getId(),
+            'ik_desc' => $this->getDescription()
         );
 
-        $alias       = $this->getPaysystemAlias();
-        $baggage     = $this->getBaggage();
         $success_url = $this->getSuccessUrl();
-        $fail_url    = $this->getFailUrl();
-        $status_url  = $this->getStatusUrl();
+        $fail_url = $this->getFailUrl();
+        $status_url = $this->getStatusUrl();
+        $locale = $this->getLocale();
 
-        if (!empty($alias)) {
-            $return['ik_paysystem_alias'] = (string) $alias;
+        if ($locale)
+            $fields['ik_loc'] = $locale;
+
+        $fields['ik_x_baggage'] = (string)$this->getBaggage();
+
+        if ($success_url)
+        {
+            $fields['ik_suc_u'] = (string)$success_url;
+            $fields['ik_suc_m'] = (string)$this->getSuccessMethod();
         }
 
-        if (!empty($baggage)) {
-            $return['ik_baggage_fields'] = (string) $baggage;
+        if ($fail_url)
+        {
+            $fields['ik_fal_u'] = (string)$fail_url;
+            $fields['ik_fal_m'] = (string)$this->getFailMethod();
         }
 
-        if (!empty($success_url)) {
-            $return['ik_success_url']    = (string) $success_url;
-            $return['ik_success_method'] = (string) $this->getSuccessMethod();
+        if ($status_url)
+        {
+            $fields['ik_ia_u'] = (string)$status_url;
+            $fields['ik_ia_m'] = (string)$this->getStatusMethod();
         }
-
-        if (!empty($fail_url)) {
-            $return['ik_fail_url']    = (string) $fail_url;
-            $return['ik_fail_method'] = (string) $this->getFailMethod();
-        }
-
-        if (!empty($status_url)) {
-            $return['ik_status_url']    = (string) $status_url;
-            $return['ik_status_method'] = (string) $this->getStatusMethod();
-        }
-
-        return $return;
+        return $fields;
     }
 
     /**
@@ -583,9 +576,8 @@ class Interkassa_Payment
      */
     public function setFormAction($url)
     {
-        if (!empty($url)) {
-            $this->_form_action = (string) $url;
-        }
+        if ($url)
+            $this->_form_action = (string)$url;
 
         return $this;
     }
@@ -598,5 +590,25 @@ class Interkassa_Payment
     public function getShop()
     {
         return $this->_shop;
+    }
+
+    /**
+     * Set users interface locale
+     * @param $locale
+     * @return Interkassa_Payment self
+     */
+    public function setLocale($locale)
+    {
+        $this->_locale = $locale;
+        return $this;
+    }
+
+    /**
+     * Get users interface locale
+     * return string
+     */
+    public function getLocale()
+    {
+        return $this->_locale;
     }
 }

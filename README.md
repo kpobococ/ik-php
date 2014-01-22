@@ -1,7 +1,7 @@
 Interkassa API for PHP
 ======================
 
-This library simplifies working with [interkassa payment system](http://interkassa.com).
+This library simplifies working with [interkassa payment system V 2.0](http://new.interkassa.com).
 
 Basic usage
 -----------
