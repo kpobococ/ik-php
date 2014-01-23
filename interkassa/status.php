@@ -73,7 +73,6 @@ class Interkassa_Status
                      'ik_am' => 'Payment amount',
                      'ik_desc' => 'Payment description',
                      'ik_pw_via' => 'Payway Via',
-                     'ik_act' => 'Action',
                      'ik_sign' => 'Payment Signature',
                      'ik_cur' => 'Currency',
                      'ik_inv_prc' => 'Payment Time',
