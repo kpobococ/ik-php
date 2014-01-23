@@ -21,18 +21,10 @@ if (count($_POST))
         // The signature was incorrect, send a 400 error to interkassa
         // They should resend payment status request until they receive a 200 status
         header('HTTP/1.0 400 Bad Request');
-        ob_start();
-        var_dump($e);
-        $output = ob_get_contents();
-        file_put_contents('LOG.txt', $output);
         exit;
     }
-    ob_start();
-    $payment = $status->getPayment();
 
-    var_dump($payment);
-    $output = ob_get_contents();
-    file_put_contents('LOG.txt', $output);
+    $payment = $status->getPayment();
 }
 else
 {
