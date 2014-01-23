@@ -8,6 +8,7 @@
  * @license MIT-style license
  * @package Interkassa
  * @author Anton Suprun <kpobococ@gmail.com>
+ * @author Odarchenko N.D. <odarchenko.n.d@gmail.com>
  * @version 1.0.0
  */
 
@@ -54,6 +55,7 @@ class Interkassa
     const FEES_PAYER_SHOP = 0;
     const FEES_PAYER_BUYER = 1;
     const FEES_PAYER_EQUAL = 2;
+
     /**#@-*/
 
     /**
@@ -76,28 +78,25 @@ class Interkassa
      */
     public static function autoload($class)
     {
-        if (class_exists($class, false) || interface_exists($class, false)) {
+        if (class_exists($class, false) || interface_exists($class, false))
             return true;
-        }
 
-        if (strpos($class, 'Interkassa_') !== 0) {
+        if (strpos($class, 'Interkassa_') !== 0)
             return false;
-        }
 
-        $dir  = dirname(__FILE__);
+        $dir = dirname(__FILE__);
         $bits = explode('_', $class);
 
-        if (!function_exists('lcfirst')) {
-            foreach ($bits as $i => $bit) {
+        if (!function_exists('lcfirst'))
+            foreach ($bits as $i => $bit)
                 $bits[$i] = strtolower($bit[0]) . substr($bit, 1);
-            }
-        } else {
+        else
             $bits = array_map('lcfirst', $bits);
-        }
 
         $file = $dir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $bits) . '.php';
 
-        if (file_exists($file)) {
+        if (file_exists($file))
+        {
             require $file;
             return class_exists($class, false) || interface_exists($class, false);
         }
