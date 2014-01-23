@@ -118,6 +118,12 @@ class Interkassa_Payment
     protected $_locale = false;
 
     /**
+     * Users currency name
+     * @var string
+     */
+    protected $_currency = false;
+
+    /**
      * Create payment instance
      *
      * @param Interkassa_Shop $shop
@@ -140,7 +146,6 @@ class Interkassa_Payment
      * - id - payment id
      * - amount - payment amount
      * - description - payment description
-     * - paysystem_alias - payment system alias. Optional
      * - baggage - payment baggage field. Optional
      * - success_url - url to redirect the user in case of success. Optional
      * - fail_url - url to redirect the user in case of failure. Optional
@@ -222,6 +227,11 @@ class Interkassa_Payment
         if (!empty($options['locale']))
         {
             $this->setLocale($options['locale']);
+        }
+
+        if (!empty($options['currency']))
+        {
+            $this->setCurrency($options['currency']);
         }
     }
 
@@ -531,6 +541,7 @@ class Interkassa_Payment
         $fail_url = $this->getFailUrl();
         $status_url = $this->getStatusUrl();
         $locale = $this->getLocale();
+        $curr = $this->getCurrency();
 
         if ($locale)
             $fields['ik_loc'] = $locale;
@@ -554,6 +565,10 @@ class Interkassa_Payment
             $fields['ik_ia_u'] = (string)$status_url;
             $fields['ik_ia_m'] = (string)$this->getStatusMethod();
         }
+
+        if ($curr)
+            $fields['ik_cur'] = (string)$curr;
+
         return $fields;
     }
 
@@ -610,5 +625,24 @@ class Interkassa_Payment
     public function getLocale()
     {
         return $this->_locale;
+    }
+
+    /**
+     * ex. USD; EUR; UAH
+     * @param $currency
+     * @return Interkassa_Payment self
+     */
+    public function setCurrency($currency)
+    {
+        $this->_currency = $currency;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->_currency;
     }
 }

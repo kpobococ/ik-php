@@ -45,7 +45,8 @@ else
         'id' => $payment_id,
         'amount' => $payment_amount,
         'description' => $payment_desc,
-        'locale' => 'en'
+        'locale' => 'en',
+        'currency' => 'USD'
     ));
     $payment->setBaggage('test_baggage');
 
