@@ -1,0 +1,26 @@
+{
+    "name":        "nick4fake/interkassa",
+    "description": "Library for interkassa APIv2",
+    "license":     "MIT",
+    "authors":     [
+        {
+            "name":  "Anton Suprun",
+            "email": "kpobococ@gmail.com"
+        }
+    ],
+    "require":     {
+        "php": ">=5.4"
+    },
+    "autoload":    {
+        "files": [
+            "interkassa.php"
+        ]
+    },
+    "extra":       {
+        "branch-alias": {
+            "dev-master": "2-dev"
+        }
+    },
+
+    "minimum-stability": "dev"
+}
