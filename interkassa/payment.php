@@ -124,6 +124,21 @@ class Interkassa_Payment
     protected $_currency = false;
 
     /**
+     * @var string
+     */
+    protected $_action;
+
+    /**
+     * @var string
+     */
+    protected $_interface;
+
+    /**
+     * @var string
+     */
+    protected $_paywayVia;
+
+    /**
      * Create payment instance
      *
      * @param Interkassa_Shop $shop
@@ -164,18 +179,15 @@ class Interkassa_Payment
     {
         $this->_shop = $shop;
 
-        if (!isset($options['id']))
-        {
+        if (!isset($options['id'])) {
             throw new Interkassa_Exception('Payment id is required');
         }
 
-        if (!isset($options['amount']))
-        {
+        if (!isset($options['amount'])) {
             throw new Interkassa_Exception('Payment amount is required');
         }
 
-        if (!isset($options['description']))
-        {
+        if (!isset($options['description'])) {
             throw new Interkassa_Exception('Payment description is required');
         }
 
@@ -184,55 +196,112 @@ class Interkassa_Payment
         $this->_description = (string)$options['description'];
 
 
-        if (!empty($options['baggage']))
-        {
+        if (!empty($options['baggage'])) {
             $this->setBaggage($options['baggage']);
         }
 
-        if (!empty($options['success_url']))
-        {
+        if (!empty($options['success_url'])) {
             $this->setSuccessUrl($options['success_url']);
         }
 
-        if (!empty($options['success_method']))
-        {
+        if (!empty($options['success_method'])) {
             $this->setSuccessMethod($options['success_method']);
         }
 
-        if (!empty($options['fail_url']))
-        {
+        if (!empty($options['fail_url'])) {
             $this->setFailUrl($options['fail_url']);
         }
 
-        if (!empty($options['fail_method']))
-        {
+        if (!empty($options['fail_method'])) {
             $this->setFailMethod($options['fail_method']);
         }
 
-        if (!empty($options['status_url']))
-        {
+        if (!empty($options['status_url'])) {
             $this->setStatusUrl($options['status_url']);
         }
 
-        if (!empty($options['status_method']))
-        {
+        if (!empty($options['status_method'])) {
             $this->setStatusMethod($options['status_method']);
         }
 
-        if (!empty($options['form_action']))
-        {
+        if (!empty($options['form_action'])) {
             $this->setFormAction($options['form_action']);
         }
 
-        if (!empty($options['locale']))
-        {
+        if (!empty($options['locale'])) {
             $this->setLocale($options['locale']);
         }
 
-        if (!empty($options['currency']))
-        {
+        if (!empty($options['currency'])) {
             $this->setCurrency($options['currency']);
         }
+
+        if (!empty($options['action'])) {
+            $this->setAction($options['action']);
+        }
+
+        if (!empty($options['interface'])) {
+            $this->setInterface($options['interface']);
+        }
+
+        if (!empty($options['payway_via'])) {
+            $this->setPaywayVia($options['payway_via']);
+        }
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getPaywayVia()
+    {
+        return $this->_paywayVia;
+    }
+
+    /**
+     * @param $payway
+     * @return $this
+     */
+    public function setPaywayVia($payway)
+    {
+        $this->_paywayVia = $payway;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->_action;
+    }
+
+    /**
+     * @param $action
+     * @return $this
+     */
+    public function setAction($action)
+    {
+        $this->_action = $action;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInterface()
+    {
+        return $this->_interface;
+    }
+
+    /**
+     * @param $interface
+     * @return $this
+     */
+    public function setInterface($interface)
+    {
+        $this->_interface = $interface;
+        return $this;
     }
 
     /**
@@ -296,8 +365,7 @@ class Interkassa_Payment
      */
     public function setBaggage($baggage)
     {
-        if (!empty($baggage))
-        {
+        if (!empty($baggage)) {
             $this->_baggage = (string)$baggage;
         }
 
@@ -323,8 +391,7 @@ class Interkassa_Payment
      */
     public function setSuccessUrl($url)
     {
-        if (!empty($url))
-        {
+        if (!empty($url)) {
             $this->_success_url = (string)$url;
         }
 
@@ -357,8 +424,7 @@ class Interkassa_Payment
      */
     public function setSuccessMethod($method)
     {
-        if (empty($method))
-        {
+        if (empty($method)) {
             return $this;
         }
 
@@ -368,8 +434,7 @@ class Interkassa_Payment
             Interkassa::METHOD_LINK
         );
 
-        if (in_array($method, $methods))
-        {
+        if (in_array($method, $methods)) {
             $this->_success_method = $method;
         }
 
@@ -395,8 +460,7 @@ class Interkassa_Payment
      */
     public function setFailUrl($url)
     {
-        if (!empty($url))
-        {
+        if (!empty($url)) {
             $this->_fail_url = (string)$url;
         }
 
@@ -429,8 +493,7 @@ class Interkassa_Payment
      */
     public function setFailMethod($method)
     {
-        if (empty($method))
-        {
+        if (empty($method)) {
             return $this;
         }
 
@@ -440,8 +503,7 @@ class Interkassa_Payment
             Interkassa::METHOD_LINK
         );
 
-        if (in_array($method, $methods))
-        {
+        if (in_array($method, $methods)) {
             $this->_fail_method = $method;
         }
 
@@ -467,8 +529,7 @@ class Interkassa_Payment
      */
     public function setStatusUrl($url)
     {
-        if (!empty($url))
-        {
+        if (!empty($url)) {
             $this->_status_url = (string)$url;
         }
 
@@ -510,8 +571,7 @@ class Interkassa_Payment
             Interkassa::METHOD_OFF
         );
 
-        if (in_array($method, $methods))
-        {
+        if (in_array($method, $methods)) {
             $this->_status_method = $method;
         }
 
@@ -532,9 +592,9 @@ class Interkassa_Payment
     {
         $fields = array(
             'ik_co_id' => $this->getShop()->getId(),
-            'ik_am' => $this->getAmountAsString(),
+            'ik_am'    => $this->getAmountAsString(),
             'ik_pm_no' => $this->getId(),
-            'ik_desc' => $this->getDescription()
+            'ik_desc'  => $this->getDescription()
         );
 
         $success_url = $this->getSuccessUrl();
@@ -542,32 +602,40 @@ class Interkassa_Payment
         $status_url = $this->getStatusUrl();
         $locale = $this->getLocale();
         $curr = $this->getCurrency();
+        $action = $this->getAction();
+        $interface = $this->getInterface();
 
-        if ($locale)
+        if ($locale) {
             $fields['ik_loc'] = $locale;
+        }
 
         $fields['ik_x_baggage'] = (string)$this->getBaggage();
 
-        if ($success_url)
-        {
+        if ($success_url) {
             $fields['ik_suc_u'] = (string)$success_url;
             $fields['ik_suc_m'] = (string)$this->getSuccessMethod();
         }
 
-        if ($fail_url)
-        {
+        if ($fail_url) {
             $fields['ik_fal_u'] = (string)$fail_url;
             $fields['ik_fal_m'] = (string)$this->getFailMethod();
         }
 
-        if ($status_url)
-        {
+        if ($status_url) {
             $fields['ik_ia_u'] = (string)$status_url;
             $fields['ik_ia_m'] = (string)$this->getStatusMethod();
         }
 
-        if ($curr)
+        if ($curr) {
             $fields['ik_cur'] = (string)$curr;
+        }
+
+        if ($action) {
+            $fields['ik_act'] = (string)$action;
+        }
+        if ($interface) {
+            $fields['ik_int'] = (string)$interface;
+        }
 
         return $fields;
     }
