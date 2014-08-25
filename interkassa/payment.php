@@ -604,6 +604,7 @@ class Interkassa_Payment
         $curr = $this->getCurrency();
         $action = $this->getAction();
         $interface = $this->getInterface();
+        $payway = $this->getPaywayVia();
 
         if ($locale) {
             $fields['ik_loc'] = $locale;
@@ -635,6 +636,9 @@ class Interkassa_Payment
         }
         if ($interface) {
             $fields['ik_int'] = (string)$interface;
+        }
+        if ($payway) {
+            $fields['ik_pw_via'] = (string)$payway;
         }
 
         return $fields;
