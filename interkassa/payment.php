@@ -77,6 +77,13 @@ class Interkassa_Payment
     protected $_fail_url = false;
 
     /**
+     * Pending url
+     *
+     * @var string
+     */
+    protected $_pending_url = false;
+
+    /**
      * Status url
      *
      * @var string
@@ -96,6 +103,14 @@ class Interkassa_Payment
      * @var string
      */
     protected $_fail_method = Interkassa::METHOD_POST;
+
+
+    /**
+     * Status url method
+     *
+     * @var string
+     */
+    protected $_pending_method = Interkassa::METHOD_POST;
 
     /**
      * Status url method
@@ -164,8 +179,10 @@ class Interkassa_Payment
      * - baggage - payment baggage field. Optional
      * - success_url - url to redirect the user in case of success. Optional
      * - fail_url - url to redirect the user in case of failure. Optional
+     * - pending_url - url is used when redirecting client from SCI back to checkout page, if payment is in process. Optional
      * - status_url - url to send payment status. Optional
      * - success_method - method to use when redirecting to success_url. Optional
+     * - pending_method - method to use when redirecting to success_url. Optional
      * - fail_method - method to use when redirecting to fail_url. Optional
      * - status_method - method to use when sending payment status. Optional
      * - form_action - payment form action url. Optional
@@ -216,6 +233,14 @@ class Interkassa_Payment
             $this->setFailMethod($options['fail_method']);
         }
 
+        if (!empty($options['pending_url'])) {
+            $this->setPendingUrl($options['pending_url']);
+        }
+
+        if (!empty($options['pending_method'])) {
+            $this->setPendingMethod($options['pending_method']);
+        }
+
         if (!empty($options['status_url'])) {
             $this->setStatusUrl($options['status_url']);
         }
@@ -247,6 +272,42 @@ class Interkassa_Payment
         if (!empty($options['payway_via'])) {
             $this->setPaywayVia($options['payway_via']);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPendingUrl()
+    {
+        return $this->_pending_url;
+    }
+
+    /**
+     * @param string $pending_url
+     * @return $this
+     */
+    public function setPendingUrl( $pending_url )
+    {
+        $this->_pending_url = $pending_url;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPendingMethod()
+    {
+        return $this->_pending_method;
+    }
+
+    /**
+     * @param string $pending_method
+     * @return $this
+     */
+    public function setPendingMethod( $pending_method )
+    {
+        $this->_pending_method = $pending_method;
+        return $this;
     }
 
 
@@ -600,6 +661,7 @@ class Interkassa_Payment
         $success_url = $this->getSuccessUrl();
         $fail_url = $this->getFailUrl();
         $status_url = $this->getStatusUrl();
+        $pending_url = $this->getPendingUrl();
         $locale = $this->getLocale();
         $curr = $this->getCurrency();
         $action = $this->getAction();
@@ -620,6 +682,11 @@ class Interkassa_Payment
         if ($fail_url) {
             $fields['ik_fal_u'] = (string)$fail_url;
             $fields['ik_fal_m'] = (string)$this->getFailMethod();
+        }
+
+        if ($pending_url) {
+            $fields['ik_pnd_u'] = (string)$pending_url;
+            $fields['ik_pnd_m'] = (string)$this->getPendingMethod();
         }
 
         if ($status_url) {
