@@ -24,23 +24,23 @@ Next, let's create a simple payment:
 <?php
 
 // The following parameters are provided by interkassa
-$shop_id = '...';
+$shop_id    = '...';
 $secret_key = '...';
 
 // Create a shop
 $shop = Interkassa_Shop::factory(array(
-    'id' => $shop_id,
+    'id'         => $shop_id,
     'secret_key' => $secret_key
 ));
 
 // Create a payment
-$payment_id = '...'; // Your payment id
+$payment_id     = '...'; // Your payment id
 $payment_amount = '...'; // The amount to charge your shop's user
-$payment_desc = '...'; // Payment description
+$payment_desc   = '...'; // Payment description
 
 $payment = $shop->createPayment(array(
-    'id' => $payment_id,
-    'amount' => $payment_amount,
+    'id'          => $payment_id,
+    'amount'      => $payment_amount,
     'description' => $payment_desc
 ));
 ```
@@ -53,17 +53,13 @@ We now have everything we need to render the payment form:
 // ... create and configure the payment object
 
 ?>
-<form action="<?= $payment->getFormAction(); ?>" method="post">
+<form action="<?= htmlentities($payment->getFormAction()); ?>" method="post">
     <?php foreach ($payment->getFormValues() as $field => $value): ?>
-    <input type="hidden" name="<?= $field; ?>" value="<?= $value; ?>" />
+    <input type="hidden" name="<?= htmlentities($field); ?>" value="<?= htmlentities($value); ?>" />
     <?php endforeach; ?>
     <button type="submit">Submit</button>
 </form>
 ```
-
-Note that the above example does not escape any data. If you have double quotes
-or other entities in payment description, you have to escape the values manually,
-using `htmlentities()` php function, for example.
 
 Processing payment status requests
 ----------------------------------
@@ -89,7 +85,7 @@ And inside the `ik-status.php`:
 // ... initialize library as usual
 
 $shop = Interkassa_Shop::factory(array(
-    'id' => $shop_id,
+    'id'         => $shop_id,
     'secret_key' => $secret_key
 ));
 
@@ -104,6 +100,8 @@ try {
 
 $payment = $status->getPayment();
 ```
+
+This transparently checks the signature of the payment.
 
 The `$status` variable now contains an instance of `Interkassa_Status` class. The
 `$payment` variable holds an instance of `Interkassa_Payment` with all the initial

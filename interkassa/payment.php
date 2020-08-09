@@ -9,6 +9,9 @@
  * @package Interkassa
  * @author Anton Suprun <kpobococ@gmail.com>
  * @author Odarchenko N.D. <odarchenko.n.d@gmail.com>
+ * @author Bohdan Yurov <bogdan@yurov.me>
+ * @author liberulo <odesskij1992@gmail.com>
+ * @author Oleksii Mylotskyi <spalaxinco@gmail.com>
  * @version 1.0.0
  */
 
@@ -104,9 +107,8 @@ class Interkassa_Payment
      */
     protected $_fail_method = Interkassa::METHOD_POST;
 
-
     /**
-     * Status url method
+     * Pending url method
      *
      * @var string
      */
@@ -139,19 +141,31 @@ class Interkassa_Payment
     protected $_currency = false;
 
     /**
+     * Initial payment action
+     *
+     * Allows to set initial payment state
+     *
      * @var string
      */
-    protected $_action;
+    protected $_action = false;
 
     /**
+     * SCI interface
+     *
      * @var string
      */
-    protected $_interface;
+    protected $_interface = false;
 
     /**
+     * Force user payment method
+     *
+     * Requires {@link Interkassa_Payment::$_action}
+     * to be set to either {@link Interkassa::ACTION_PROCESS}
+     * or {@link Interkassa::ACTION_PAYWAY}
+     *
      * @var string
      */
-    protected $_paywayVia;
+    protected $_paywayVia = false;
 
     /**
      * Create payment instance
@@ -182,10 +196,13 @@ class Interkassa_Payment
      * - pending_url - url is used when redirecting client from SCI back to checkout page, if payment is in process. Optional
      * - status_url - url to send payment status. Optional
      * - success_method - method to use when redirecting to success_url. Optional
-     * - pending_method - method to use when redirecting to success_url. Optional
+     * - pending_method - method to use when redirecting to pending_url. Optional
      * - fail_method - method to use when redirecting to fail_url. Optional
      * - status_method - method to use when sending payment status. Optional
      * - form_action - payment form action url. Optional
+     * - action - initial payment action. Optional
+     * - interface - SCI interface. Optional
+     * - payway_via - force user payment method. Optional
      *
      * @param Interkassa_Shop $shop
      * @param array $options an array of payment options
@@ -275,6 +292,8 @@ class Interkassa_Payment
     }
 
     /**
+     * Get pending url
+     *
      * @return string
      */
     public function getPendingUrl()
@@ -283,16 +302,27 @@ class Interkassa_Payment
     }
 
     /**
+     * Set pending url
+     *
      * @param string $pending_url
-     * @return $this
+     *
+     * @return Interkassa_Payment self
      */
-    public function setPendingUrl( $pending_url )
+    public function setPendingUrl($url)
     {
-        $this->_pending_url = $pending_url;
+        if (!empty($url)) {
+            $this->_pending_url = (string)$pending_url;
+        }
+
         return $this;
     }
 
     /**
+     * Get pending url method
+     *
+     * Returns {@link Interkassa::METHOD_POST}, {@link Interkassa::METHOD_GET}
+     * or {@link Interkassa::METHOD_LINK}
+     *
      * @return string
      */
     public function getPendingMethod()
@@ -301,17 +331,38 @@ class Interkassa_Payment
     }
 
     /**
-     * @param string $pending_method
-     * @return $this
+     * Set pending url method
+     *
+     * @param string $method
+     *
+     * @uses Interkassa::METHOD_POST
+     * @uses Interkassa::METHOD_GET
+     * @uses Interkassa::METHOD_LINK
+     *
+     * @return Interkassa_Payment self
      */
-    public function setPendingMethod( $pending_method )
+    public function setPendingMethod($method)
     {
-        $this->_pending_method = $pending_method;
+        if (empty($method)) {
+            return $this;
+        }
+
+        $methods = array(
+            Interkassa::METHOD_POST,
+            Interkassa::METHOD_GET,
+            Interkassa::METHOD_LINK
+        );
+
+        if (in_array($method, $methods)) {
+            $this->_pending_method = $method;
+        }
+
         return $this;
     }
 
-
     /**
+     * Get forced user payment method
+     *
      * @return string
      */
     public function getPaywayVia()
@@ -320,16 +371,29 @@ class Interkassa_Payment
     }
 
     /**
-     * @param $payway
-     * @return $this
+     * Set forced user payment method
+     *
+     * Required {@link Interkassa_Payment::$_action} to be set to either
+     * {@link Interkassa::ACTION_PROCESS} or {@link Interkassa::ACTION_PAYWAY}
+     *
+     * @param string $payway
+     *
+     * @return Interkassa_Payment self
      */
     public function setPaywayVia($payway)
     {
+        if (empty($payway)) {
+            return $this;
+        }
+
         $this->_paywayVia = $payway;
+
         return $this;
     }
 
     /**
+     * Get initial payment action
+     *
      * @return string
      */
     public function getAction()
@@ -338,16 +402,38 @@ class Interkassa_Payment
     }
 
     /**
-     * @param $action
-     * @return $this
+     * Set initial payment action
+     *
+     * @param string $action
+     *
+     * @uses Interkassa::ACTION_PROCESS
+     * @uses Interkassa::ACTION_PAYWAYS
+     * @uses Interkassa::ACTION_PAYWAY
+     *
+     * @return Interkassa_Payment self
      */
     public function setAction($action)
     {
-        $this->_action = $action;
+        if (empty($action)) {
+            return $this;
+        }
+
+        $actions = array(
+            Interkassa::ACTION_PROCESS,
+            Interkassa::ACTION_PAYWAYS,
+            Interkassa::ACTION_PAYWAY
+        );
+
+        if (in_array($action, $actions)) {
+            $this->_action = $action;
+        }
+
         return $this;
     }
 
     /**
+     * Get SCI interface
+     *
      * @return string
      */
     public function getInterface()
@@ -356,12 +442,30 @@ class Interkassa_Payment
     }
 
     /**
-     * @param $interface
-     * @return $this
+     * Set SCI interface
+     *
+     * @uses Interkassa::INTERFACE_WEB
+     * @uses Interkassa::INTERFACE_JSON
+     *
+     * @param string $interface
+     *
+     * @return Interkassa_Payment self
      */
     public function setInterface($interface)
     {
-        $this->_interface = $interface;
+        if (empty($interface)) {
+            return $this;
+        }
+
+        $interfaces = array(
+            Interkassa::INTERFACE_WEB,
+            Interkassa::INTERFACE_JSON
+        );
+
+        if (in_array($interface, $interfaces)) {
+            $this->_interface = $interface;
+        }
+
         return $this;
     }
 
@@ -659,14 +763,14 @@ class Interkassa_Payment
         );
 
         $success_url = $this->getSuccessUrl();
-        $fail_url = $this->getFailUrl();
-        $status_url = $this->getStatusUrl();
+        $fail_url    = $this->getFailUrl();
+        $status_url  = $this->getStatusUrl();
         $pending_url = $this->getPendingUrl();
-        $locale = $this->getLocale();
-        $curr = $this->getCurrency();
-        $action = $this->getAction();
-        $interface = $this->getInterface();
-        $payway = $this->getPaywayVia();
+        $locale      = $this->getLocale();
+        $curr        = $this->getCurrency();
+        $action      = $this->getAction();
+        $interface   = $this->getInterface();
+        $payway      = $this->getPaywayVia();
 
         if ($locale) {
             $fields['ik_loc'] = $locale;
@@ -701,9 +805,11 @@ class Interkassa_Payment
         if ($action) {
             $fields['ik_act'] = (string)$action;
         }
+
         if ($interface) {
             $fields['ik_int'] = (string)$interface;
         }
+
         if ($payway) {
             $fields['ik_pw_via'] = (string)$payway;
         }

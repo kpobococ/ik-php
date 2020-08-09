@@ -9,6 +9,9 @@
  * @package Interkassa
  * @author Anton Suprun <kpobococ@gmail.com>
  * @author Odarchenko N.D. <odarchenko.n.d@gmail.com>
+ * @author Bohdan Yurov <bogdan@yurov.me>
+ * @author liberulo <odesskij1992@gmail.com>
+ * @author Oleksii Mylotskyi <spalaxinco@gmail.com>
  * @version 1.0.0
  */
 
@@ -57,6 +60,26 @@ class Interkassa
     const FEES_PAYER_EQUAL = 2;
 
     /**#@-*/
+
+    /**#@+
+     * Payment action constant
+     *
+     * @see Interkassa_Payment::setAction()
+     */
+    const ACTION_PROCESS = 'process';
+    const ACTION_PAYWAYS = 'payways';
+    const ACTION_PAYWAY  = 'payway';
+
+    /**#@-*/
+
+    /**#@+
+     * Payment interface constant
+     */
+    const INTERFACE_WEB = 'web';
+    const INTERFACE_JSON = 'json';
+
+    /**#@-*/
+
 
     /**
      * Registers library autoloader as an SPL autoloader.
